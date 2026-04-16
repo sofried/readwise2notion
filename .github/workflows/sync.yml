@@ -1,0 +1,55 @@
+name: Readwise to Notion Sync
+
+on:
+  # Run every hour from 5 AM to 5 PM CST (11 AM to 11 PM UTC)
+  schedule:
+    - cron: '0 11-23 * * *'
+  
+  # Allow manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Restore synced items cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .last_sync_time.json
+            .synced_items.json
+          key: readwise-sync-state-${{ github.run_id }}
+          restore-keys: |
+            readwise-sync-state-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+      
+      - name: Run sync script
+        env:
+          READWISE_TOKEN: ${{ secrets.READWISE_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          DAYS_TO_SYNC: ${{ secrets.DAYS_TO_SYNC }}
+        run: |
+          python readwise_notion_sync.py
+      
+      - name: Upload logs (if failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-logs
+          path: |
+            *.log
+            *.txt

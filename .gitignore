@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+sync.log
+
+# Personal tokens (if hardcoded locally)
+# readwise_notion_sync.py
+
+# Sync state files
+.last_sync_time.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sync tracker (if using local version)
+readwise_sync_tracker.json
